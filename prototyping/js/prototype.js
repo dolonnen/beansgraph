@@ -24,19 +24,18 @@ var newData = {
     viewersTwitch:null,
 };
 
-var dataPoints = new Array(NUMBER_OF_DATAPOINTS);
+var dataPoints = [];
+for (i = 0; i < NUMBER_OF_DATAPOINTS; i++) {
+    dataPoints.push([undefined,undefined,undefined]);
+}
 
+var chartData = [];
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// get Data and so on
+// collect the data and so on
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function call4ViewerCount() {
-    streamIdYoutube = "tn0zpeHPfw0"
-    apiKeyYoutube = "AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk";
-    streamIdTwitch = "rocketbeanstv"
-    apiKeyTwitch = "vsiaqcev0wed3la13a05h3tyi93z2o";
-    
+function call4ViewerCount() {    
     newData['viewersYoutube'] = null;
     newData['viewersTwitch'] = null;
     
@@ -44,7 +43,6 @@ function call4ViewerCount() {
         "https://api.twitch.tv/kraken/streams/"+streamIDs['twitch']+"?client_id="+apiKeys['twitch'],
         processTwitchData
     );
-    
     $.getJSON(
         "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="+streamIDs['youtube']+"&key="+apiKeys['youtube'],
         processYtData
@@ -71,30 +69,45 @@ function updateDataTable(streamer, viewers) {
     // write Data in newData object
     if (newData[streamer] == null) {
         newData[streamer] = viewers; 
-    }  
+    } 
     
-    // iterate through the object varables of newData
-    keys = Object.keys(newData);
-    var newDataArray = [];
-    for (x in keys) {
-        if ( !$.isNumeric(newData[keys[x]])) {
-            // data not yet collected so far. Skip the whole function
-            return;
-        }
-    
-    // write the collected data into an array
-    newDataArray.push(newData[keys[x]]);
+    if ($.isNumeric(newData['viewersYoutube']) && $.isNumeric(newData['viewersTwitch'])) {
+        // data was collected already 
+        
+        // write the collected data with the time into an array
+        newDataArray = [];
+        newDataArray.push(new Date().getTime());
+        newDataArray.push(newData['viewersYoutube']);
+        newDataArray.push(newData['viewersTwitch']);
+        
+        // store the new data as data point into an an data point array
+        dataPoints.shift();
+        dataPoints.push(newDataArray);
+        
+        // generate a data object for the google chart
+//         var labels = [['Time', 'Youtube', 'Twitch']];
+//         console.log(labels.concat(dataPoints));
+        chartData = google.visualization.arrayToDataTable(dataPoints,true);
+//         chartData = google.visualization.arrayToDataTable(labels.concat(dataPoints),false);
+        
+       
+        console.log("dataPoints updated: "+dataPoints);
     }
-    
-    // store the new data as data point into an an data point array
-    newDataArray.unshift(new Date().getTime());
-    dataPoints.shift();
-    dataPoints.push(newDataArray);
-    
-    console.log("newDataArray: "+newDataArray);
-    console.log(dataPoints);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Chart drawing
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function drawChart() {
+    return false;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Init stuff
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
     
@@ -102,3 +115,8 @@ $(document).ready(function(){
     setInterval(call4ViewerCount, UPDATE_INTERVAL*33);
 
 });
+
+// Load the Google Chart Visualization API and the piechart package.
+google.charts.load('current', {'packages':['corechart']});
+// Set a callback to run when the Google Visualization API is loaded.
+google.charts.setOnLoadCallback(drawChart);
