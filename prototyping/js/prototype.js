@@ -1,10 +1,10 @@
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // Settings
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-const NUMBER_OF_DATAPOINTS = 5;
-const UPDATE_INTERVAL = 2500;
+const NUMBER_OF_DATAPOINTS = 60;
+const UPDATE_INTERVAL = 10000;
 
 var streamIDs = {
     youtube:"tn0zpeHPfw0",
@@ -15,9 +15,42 @@ var apiKeys = {
     twitch:"vsiaqcev0wed3la13a05h3tyi93z2o"
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Chart settings
+
+var chartBackgroundColor = '#333333';
+var chartTextColor = '#888888';
+
+var chartOptions = {
+    isStacked: true,
+    vAxis: {
+        minValue: 0,
+        title: "aktuelle Zuschauerzahl"
+    },
+    animation: {
+        duration: 200,
+        easing: 'out'
+    },
+    areaOpacity: 1.0,
+    colors:['#cd201f','#6441A4'],
+    backgroundColor: chartBackgroundColor,
+    hAxis: {
+        baselineColor: chartBackgroundColor,
+        gridlines: {color: chartBackgroundColor},
+        textPosition: 'none'
+    },
+    vAxis: {
+        baselineColor: chartBackgroundColor,
+        gridlines: {color: chartBackgroundColor},
+        textStyle: {color: chartTextColor}
+    },
+    legend: {position: 'none'},
+
+    
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // Internal Variables
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 var newData = {
     viewersYoutube:null,
@@ -26,14 +59,16 @@ var newData = {
 
 var dataPoints = [];
 for (i = 0; i < NUMBER_OF_DATAPOINTS; i++) {
-    dataPoints.push([undefined,undefined,undefined]);
+    dataPoints.push([null,null,null]);
 }
 
 var chartData = [];
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var chartIsReadyToDraw = false;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // collect the data and so on
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 function call4ViewerCount() {    
     newData['viewersYoutube'] = null;
@@ -50,14 +85,12 @@ function call4ViewerCount() {
 }
 
 function processYtData(result, status) {
-//     console.log("processYtData called");
     
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
     updateDataTable('viewersYoutube', viewers);
 }
 
 function processTwitchData(result, status) {
-//     console.log("processTwitchData called");
     
     var viewers = parseInt(result.stream.viewers);
     updateDataTable('viewersTwitch', viewers);
@@ -90,33 +123,59 @@ function updateDataTable(streamer, viewers) {
         chartData = google.visualization.arrayToDataTable(dataPoints,true);
 //         chartData = google.visualization.arrayToDataTable(labels.concat(dataPoints),false);
         
+        updateGraphs();
        
-        console.log("dataPoints updated: "+dataPoints);
+        console.log("Viewers Youtube: "+newData['viewersYoutube']);
+        console.log("Viewers Twitch: "+newData['viewersTwitch']);
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Chart drawing
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+// Drawing
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+function updateGraphs() {
+    // update all graphical elements with new data and draw them.
+    
+    drawChart();
+//     drawProportionBar();
+    
+    $('youtube').append(newData['viewersYoutube']);
+    $('twitch').append(newData['viewersTwitch']);
+}
 
 function drawChart() {
-    return false;
+    console.log("drawChart() called")
+    
+    if (!chartIsReadyToDraw) {
+        // Chart isn't ready to Draw (libary have to load or chart is been drawing jet). Call this function later
+        setTimeout(drawChart, 100);
+        return
+    }
+    
+    var chart = new google.visualization.AreaChart(document.getElementById('chart_container'));
+    chart.draw(chartData, chartOptions);
+    
 }
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 // Init stuff
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
     
     call4ViewerCount();
-    setInterval(call4ViewerCount, UPDATE_INTERVAL*33);
+    setInterval(call4ViewerCount, UPDATE_INTERVAL);
+    setInterval(updateGraphs, 1000);
+
 
 });
 
 // Load the Google Chart Visualization API and the piechart package.
 google.charts.load('current', {'packages':['corechart']});
 // Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(function() {
+    chartIsReadyToDraw = true;
+});
