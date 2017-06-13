@@ -7,7 +7,7 @@ const NUMBER_OF_DATAPOINTS = 60;
 const UPDATE_INTERVAL = 10000;
 
 var streamIDs = {
-    youtube:"tn0zpeHPfw0",
+    youtube:"8bYu-0ErsfE",
     twitch:"rocketbeanstv"
 };
 var apiKeys = {
@@ -59,7 +59,10 @@ var newData = {
 
 var dataPoints = [];
 for (i = 0; i < NUMBER_OF_DATAPOINTS; i++) {
-    dataPoints.push([null,null,null]);
+    dataPoints.push([
+    new Date().getTime() - UPDATE_INTERVAL * (NUMBER_OF_DATAPOINTS - 1),
+    undefined,
+    undefined]);
 }
 
 var chartData = [];
@@ -71,6 +74,7 @@ var chartIsReadyToDraw = false;
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 function call4ViewerCount() {    
+    console.log("call4ViewerCount called");
     newData['viewersYoutube'] = null;
     newData['viewersTwitch'] = null;
     
@@ -85,24 +89,28 @@ function call4ViewerCount() {
 }
 
 function processYtData(result, status) {
+    console.log("processYtData called");
+    console.log(result);
     
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
     updateDataTable('viewersYoutube', viewers);
 }
 
 function processTwitchData(result, status) {
+    console.log("processTwitchData called");
     
     var viewers = parseInt(result.stream.viewers);
     updateDataTable('viewersTwitch', viewers);
 }
 
 function updateDataTable(streamer, viewers) {
-    //console.log("updateDataTable called")
+    console.log("updateDataTable called");
     
     // write Data in newData object
     if (newData[streamer] == null) {
         newData[streamer] = viewers; 
     } 
+    
     
     if ($.isNumeric(newData['viewersYoutube']) && $.isNumeric(newData['viewersTwitch'])) {
         // data was collected already 
@@ -125,8 +133,7 @@ function updateDataTable(streamer, viewers) {
         
         updateGraphs();
        
-        console.log("Viewers Youtube: "+newData['viewersYoutube']);
-        console.log("Viewers Twitch: "+newData['viewersTwitch']);
+        console.log("dataPoints: "+dataPoints);
     }
 }
 
@@ -168,8 +175,7 @@ $(document).ready(function(){
     
     call4ViewerCount();
     setInterval(call4ViewerCount, UPDATE_INTERVAL);
-    setInterval(updateGraphs, 1000);
-
+    $(window).resize(updateGraphs);
 
 });
 
