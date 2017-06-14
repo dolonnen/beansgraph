@@ -81,23 +81,24 @@ function call4ViewerCount() {
     $.getJSON(
         "https://api.twitch.tv/kraken/streams/"+streamIDs['twitch']+"?client_id="+apiKeys['twitch'],
         processTwitchData
-    );
+    );      // typical duration: 250 - 300ms sometimes up to 400ms
     $.getJSON(
         "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="+streamIDs['youtube']+"&key="+apiKeys['youtube'],
         processYtData
-    );
+    );      // typical duration: 110 -150ms sometimes up to 250ms
 }
 
 function processYtData(result, status) {
-    console.log("processYtData called");
-    console.log(result);
+    // recieves the data from YT. If this is returning NaN, the streamID might be wrong (or the api key ^^)
+//     console.log("processYtData called");
     
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
     updateDataTable('viewersYoutube', viewers);
 }
 
 function processTwitchData(result, status) {
-    console.log("processTwitchData called");
+    // recieves the data from Twitch. If this is returning NaN, the api key might be wrong
+//     console.log("processTwitchData called");
     
     var viewers = parseInt(result.stream.viewers);
     updateDataTable('viewersTwitch', viewers);
@@ -173,9 +174,9 @@ function drawChart() {
 
 $(document).ready(function(){
     
-    call4ViewerCount();
-    setInterval(call4ViewerCount, UPDATE_INTERVAL);
-    $(window).resize(updateGraphs);
+//     call4ViewerCount();
+//     setInterval(call4ViewerCount, UPDATE_INTERVAL*44);
+//     $(window).resize(updateGraphs);
 
 });
 
