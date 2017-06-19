@@ -58,13 +58,6 @@ var newData = {
 };
 
 var dataPoints = [];
-for (i = 0; i < NUMBER_OF_DATAPOINTS; i++) {
-    dataPoints.push([
-    new Date().getTime() - UPDATE_INTERVAL * (NUMBER_OF_DATAPOINTS - 1),
-    undefined,
-    undefined]);
-}
-
 var chartData = [];
 
 var chartIsReadyToDraw = false;
@@ -117,24 +110,34 @@ function updateDataTable(streamer, viewers) {
         // data was collected already 
         
         // write the collected data with the time into an array
-        newDataArray = [];
+        var newDataArray = [];
         newDataArray.push(new Date().getTime());
         newDataArray.push(newData['viewersYoutube']);
         newDataArray.push(newData['viewersTwitch']);
         
         // store the new data as data point into an an data point array
-        dataPoints.shift();
-        dataPoints.push(newDataArray);
+        dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
         
         // generate a data object for the google chart
-//         var labels = [['Time', 'Youtube', 'Twitch']];
-//         console.log(labels.concat(dataPoints));
-        chartData = google.visualization.arrayToDataTable(dataPoints,true);
-//         chartData = google.visualization.arrayToDataTable(labels.concat(dataPoints),false);
+        if (dataPoints.length <  NUMBER_OF_DATAPOINTS) {
+            var undefinedArray = [];
+            for (i = 1; i <= NUMBER_OF_DATAPOINTS - dataPoints.length; i++) {
+                undefinedArray.push([
+                    new Date().getTime() + UPDATE_INTERVAL * i,
+                    undefined,
+                    undefined,
+                ]);
+            }
+            console.log(undefinedArray);
+            chartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
+        }
+        else {
+            chartData = google.visualization.arrayToDataTable(dataPoints,true);
+        }
         
         updateGraphs();
        
-//         console.log("dataPoints: "+dataPoints);
+        console.log("dataPoints: "+dataPoints);
     }
 }
 
@@ -159,18 +162,17 @@ function drawAreaChart() {
         setTimeout(drawAreaChart, 100);
         return
     }
-    
     var chart = new google.visualization.AreaChart(document.getElementById('chart_container'));
     chart.draw(chartData, chartOptions);
     
 }
 
 function drawProportionBar() {    
-    console.log("drawProportionBar() called");
+//     console.log("drawProportionBar() called");
 
-    var currentData = dataPoints[dataPoints.length - 1];
+    var currentData = dataPoints.last();
     var shareYoutube = 100 * currentData[1] / (currentData[1] + currentData[2]);
-    var shareTwitch = 100 * currentData[2] / (currentData[1] + currentData[2]);
+    var shareTwitch = 100 - shareYoutube;
     
     $('#youtube_bar').css('width', shareYoutube + '%');
     $('#twitch_bar').css('width', shareTwitch + '%');
@@ -181,7 +183,24 @@ function drawProportionBar() {
     
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// Helpers
+//////////////////////////////////////////////////////////////////////////////////////////
 
+if (!Array.prototype.last){
+    Array.prototype.last = function() {
+        return this[this.length - 1];
+    };
+};
+
+if (!Array.prototype.pushToMaxOrShift){
+    Array.prototype.pushToMaxOrShift = function(element, maxLength) {
+        this.push(element);
+        if (this.length > parseInt(maxLength)) {
+            this.shift();
+        }
+    };
+};
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Init stuff
