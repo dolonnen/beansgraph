@@ -60,7 +60,8 @@ var newData = {
 var dataPoints = [];
 var chartData = [];
 
-var chartIsReadyToDraw = false;
+// var areaChart = undefined;
+var areaChartIsReadyToDraw = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // collect the data and so on
@@ -118,8 +119,11 @@ function updateDataTable(streamer, viewers) {
         // store the new data as data point into an an data point array
         dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
         
+        console.log("dataPoints: "+dataPoints);
+        
         // generate a data object for the google chart
         if (dataPoints.length <  NUMBER_OF_DATAPOINTS) {
+            // dataPoint array not complete, we need pseudo data points.
             var undefinedArray = [];
             for (i = 1; i <= NUMBER_OF_DATAPOINTS - dataPoints.length; i++) {
                 undefinedArray.push([
@@ -128,16 +132,15 @@ function updateDataTable(streamer, viewers) {
                     undefined,
                 ]);
             }
-            console.log(undefinedArray);
             chartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
         }
         else {
+            // dataPoints array complete and ready for the Google graph libary
             chartData = google.visualization.arrayToDataTable(dataPoints,true);
         }
         
         updateGraphs();
        
-        console.log("dataPoints: "+dataPoints);
     }
 }
 
@@ -157,13 +160,15 @@ function updateGraphs() {
 function drawAreaChart() {
 //     console.log("drawAreaChart() called");
     
-    if (!chartIsReadyToDraw) {
+    if (!areaChartIsReadyToDraw) {
         // Chart isn't ready to Draw (libary have to load or chart is been drawing jet). Call this function later
         setTimeout(drawAreaChart, 100);
         return
     }
-    var chart = new google.visualization.AreaChart(document.getElementById('chart_container'));
-    chart.draw(chartData, chartOptions);
+    
+    var areaChart = new google.visualization.AreaChart(document.getElementById('areaChart_container'));
+    
+    areaChart.draw(chartData, chartOptions);
     
 }
 
@@ -193,13 +198,11 @@ if (!Array.prototype.last){
     };
 };
 
-if (!Array.prototype.pushToMaxOrShift){
-    Array.prototype.pushToMaxOrShift = function(element, maxLength) {
-        this.push(element);
-        if (this.length > parseInt(maxLength)) {
-            this.shift();
-        }
-    };
+Array.prototype.pushToMaxOrShift = function(element, maxLength) {
+    this.push(element);
+    if (this.length > parseInt(maxLength)) {
+        this.shift();
+    }
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -208,9 +211,9 @@ if (!Array.prototype.pushToMaxOrShift){
 
 $(document).ready(function(){
     
-     call4ViewerCount();
-     setInterval(call4ViewerCount, UPDATE_INTERVAL);
-     $(window).resize(updateGraphs);
+    call4ViewerCount();
+    setInterval(call4ViewerCount, UPDATE_INTERVAL);
+    $(window).resize(updateGraphs);
 
 });
 
@@ -218,5 +221,5 @@ $(document).ready(function(){
 google.charts.load('current', {'packages':['corechart']});
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(function() {
-    chartIsReadyToDraw = true;
+    areaChartIsReadyToDraw = true;
 });
