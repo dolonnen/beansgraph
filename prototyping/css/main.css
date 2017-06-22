@@ -44,9 +44,15 @@
 }
 
 
-/* Chart */
+/* Charts */
 
-.chart_container {
+.areachart_container {
     height: 700px;
     clear: both;
 }
+
+.barchart_container {
+    height: 700px;
+    clear: both;
+}
+

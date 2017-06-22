@@ -1,9 +1,9 @@
 
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // Settings
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-const NUMBER_OF_DATAPOINTS = 60;
+const NUMBER_OF_DATAPOINTS = 90;
 const UPDATE_INTERVAL = 10000;
 
 var streamIDs = {
@@ -48,9 +48,9 @@ var chartOptions = {
     
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // Internal Variables
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 var newData = {
     viewersYoutube:null,
@@ -58,14 +58,18 @@ var newData = {
 };
 
 var dataPoints = [];
-var chartData = [];
+var areaChartData = [];
 
-// var areaChart = undefined;
+var dataUpdateCounter = 0;
+
+var avaragePoints = [];
+var barChartData = [];
+
 var areaChartIsReadyToDraw = false;
 
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // collect the data and so on
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 function call4ViewerCount() {    
     console.log("call4ViewerCount called");
@@ -87,7 +91,7 @@ function processYtData(result, status) {
 //     console.log("processYtData called");
     
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
-    updateDataTable('viewersYoutube', viewers);
+    updateDataPoint('viewersYoutube', viewers);
 }
 
 function processTwitchData(result, status) {
@@ -95,11 +99,11 @@ function processTwitchData(result, status) {
 //     console.log("processTwitchData called");
     
     var viewers = parseInt(result.stream.viewers);
-    updateDataTable('viewersTwitch', viewers);
+    updateDataPoint('viewersTwitch', viewers);
 }
 
-function updateDataTable(streamer, viewers) {
-    console.log("updateDataTable called");
+function updateDataPoint(streamer, viewers) {
+    console.log("updateDataPoint called");
     
     // write Data in newData object
     if (newData[streamer] == null) {
@@ -121,6 +125,13 @@ function updateDataTable(streamer, viewers) {
         
         console.log("dataPoints: "+dataPoints);
         
+        dataUpdateCounter++;
+        if (dataUpdateCounter >= NUMBER_OF_DATAPOINTS) {
+            // this is enough dataPoints for calculating the avarage for the bar chart
+            dataUpdateCounter = 0;
+            updateAveragePoint();
+        }
+        
         // generate a data object for the google chart
         if (dataPoints.length <  NUMBER_OF_DATAPOINTS) {
             // dataPoint array not complete, we need pseudo data points.
@@ -133,7 +144,7 @@ function updateDataTable(streamer, viewers) {
                 ]);
             }
             chartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
-        }
+        } 
         else {
             // dataPoints array complete and ready for the Google graph libary
             chartData = google.visualization.arrayToDataTable(dataPoints,true);
@@ -144,9 +155,25 @@ function updateDataTable(streamer, viewers) {
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+function updateAveragePoint() {
+    var avarageYoutube = 0;
+    var avarageTwitch = 0;
+    for (dataPoint in dataPoints) {
+        avarageYoutube += dataPoint[1];
+        avarageTwitch += dataPoint[2];
+    }
+    avarageYoutube /= dataPoints.length();
+    avarageTwitch /= dataPoints.length();
+    
+    
+    // store the new avarage data as data point into an an data point array
+//     avaragePoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
+    
+}
+
+//////////////////////////////////////////////////////////////////////
 // Drawing
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 function updateGraphs() {
     // update all graphical elements with new data and draw them.
@@ -188,26 +215,10 @@ function drawProportionBar() {
     
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// Helpers
-//////////////////////////////////////////////////////////////////////////////////////////
 
-if (!Array.prototype.last){
-    Array.prototype.last = function() {
-        return this[this.length - 1];
-    };
-};
-
-Array.prototype.pushToMaxOrShift = function(element, maxLength) {
-    this.push(element);
-    if (this.length > parseInt(maxLength)) {
-        this.shift();
-    }
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // Init stuff
-//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
     
