@@ -46,12 +46,12 @@
 
 /* Charts */
 
-.areachart_container {
+.areaChart_container {
     height: 700px;
     clear: both;
 }
 
-.barchart_container {
+.columnChart_container {
     height: 700px;
     clear: both;
 }

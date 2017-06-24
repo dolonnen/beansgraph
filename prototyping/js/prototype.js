@@ -1,54 +1,5 @@
 
 //////////////////////////////////////////////////////////////////////
-// Settings
-//////////////////////////////////////////////////////////////////////
-
-const NUMBER_OF_DATAPOINTS = 90;
-const UPDATE_INTERVAL = 10000;
-
-var streamIDs = {
-    youtube:"8bYu-0ErsfE",      // 
-    twitch:"rocketbeanstv"
-};
-var apiKeys = {
-    youtube:"AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk",
-    twitch:"vsiaqcev0wed3la13a05h3tyi93z2o"
-};
-
-// Chart settings
-
-var chartBackgroundColor = '#333333';
-var chartTextColor = '#888888';
-
-var chartOptions = {
-    isStacked: true,
-    vAxis: {
-        minValue: 0,
-        title: "aktuelle Zuschauerzahl"
-    },
-    animation: {
-        duration: 200,
-        easing: 'out'
-    },
-    areaOpacity: 1.0,
-    colors:['#cd201f','#6441A4'],
-    backgroundColor: chartBackgroundColor,
-    hAxis: {
-        baselineColor: chartBackgroundColor,
-        gridlines: {color: chartBackgroundColor},
-        textPosition: 'none'
-    },
-    vAxis: {
-        baselineColor: chartBackgroundColor,
-        gridlines: {color: chartBackgroundColor},
-        textStyle: {color: chartTextColor}
-    },
-    legend: {position: 'none'},
-
-    
-};
-
-//////////////////////////////////////////////////////////////////////
 // Internal Variables
 //////////////////////////////////////////////////////////////////////
 
@@ -62,17 +13,18 @@ var areaChartData = [];
 
 var dataUpdateCounter = 0;
 
-var avaragePoints = [];
-var barChartData = [];
+var averagePoints = [];
+var columnChartData = [];
 
 var areaChartIsReadyToDraw = false;
+var columnChartIsReadyToDraw = false;
 
 //////////////////////////////////////////////////////////////////////
 // collect the data and so on
 //////////////////////////////////////////////////////////////////////
 
 function call4ViewerCount() {    
-    console.log("call4ViewerCount called");
+//     console.log("call4ViewerCount called");
     newData['viewersYoutube'] = null;
     newData['viewersTwitch'] = null;
     
@@ -103,7 +55,7 @@ function processTwitchData(result, status) {
 }
 
 function updateDataPoint(streamer, viewers) {
-    console.log("updateDataPoint called");
+//     console.log("updateDataPoint called");
     
     // write Data in newData object
     if (newData[streamer] == null) {
@@ -115,19 +67,19 @@ function updateDataPoint(streamer, viewers) {
         // data was collected already 
         
         // write the collected data with the time into an array
-        var newDataArray = [];
-        newDataArray.push(new Date().getTime());
-        newDataArray.push(newData['viewersYoutube']);
-        newDataArray.push(newData['viewersTwitch']);
+        var newDataArray = [
+            new Date().getTime(),
+            newData['viewersYoutube'],
+            newData['viewersTwitch']
+        ];
         
         // store the new data as data point into an an data point array
         dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
         
-        console.log("dataPoints: "+dataPoints);
-        
+        // update the data for the columnChart cyclical
         dataUpdateCounter++;
         if (dataUpdateCounter >= NUMBER_OF_DATAPOINTS) {
-            // this is enough dataPoints for calculating the avarage for the bar chart
+            // this is enough dataPoints for calculating the average for the bar chart
             dataUpdateCounter = 0;
             updateAveragePoint();
         }
@@ -143,32 +95,63 @@ function updateDataPoint(streamer, viewers) {
                     undefined,
                 ]);
             }
-            chartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
+            areaChartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
         } 
         else {
             // dataPoints array complete and ready for the Google graph libary
-            chartData = google.visualization.arrayToDataTable(dataPoints,true);
+            areaChartData = google.visualization.arrayToDataTable(dataPoints,true);
         }
         
-        updateGraphs();
+        drawProportionBar();
+        drawAreaChart();
        
     }
 }
 
 function updateAveragePoint() {
-    var avarageYoutube = 0;
-    var avarageTwitch = 0;
-    for (dataPoint in dataPoints) {
-        avarageYoutube += dataPoint[1];
-        avarageTwitch += dataPoint[2];
+    console.log("updateAveragePoint called");
+    
+    // calculate the average of all viewers for both streamers
+    var averageYoutube = 0;
+    var averageTwitch = 0;
+    for (var dataPoint of dataPoints) {
+        averageYoutube += dataPoint[1];
+        averageTwitch += dataPoint[2];
     }
-    avarageYoutube /= dataPoints.length();
-    avarageTwitch /= dataPoints.length();
+    averageYoutube = averageYoutube / dataPoints.length;
+    averageTwitch = averageTwitch / dataPoints.length;
     
+    var newAverageArray = [
+        getHoursAndSeconds(dataPoints.last()[0]), // store the time of the oldest dataPoint in the Format "hh:mm"
+        Math.round(averageYoutube),
+        Math.round(averageTwitch)
+    ];
     
-    // store the new avarage data as data point into an an data point array
-//     avaragePoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
+    // store the new average data as data point into an an data point array
+    averagePoints.pushToMaxOrShift(newAverageArray, HOURS_IN_THE_PAST * 4);
+    console.log("averagePoints: " + averagePoints);
     
+    // generate a data object for the google chart
+    if (averagePoints.length <  HOURS_IN_THE_PAST * 4) {
+        // dataPoint array not complete, we need pseudo data points.
+        var undefinedArray = [];
+        for (i = 1; i <= HOURS_IN_THE_PAST * 4 - averagePoints.length; i++) {
+            undefinedArray.push([
+//                 getHoursAndSeconds(new Date().getTime() + (15*60*1000) * i),
+                '',
+                undefined,
+                undefined,
+            ]);
+        }
+        console.log(averagePoints);
+        columnChartData = google.visualization.arrayToDataTable(averagePoints.concat(undefinedArray),true);
+    } 
+    else {
+        // dataPoints array complete and ready for the Google graph libary
+        columnChartData = google.visualization.arrayToDataTable(averagePoints,true);
+    }
+    
+    drawColumnChart();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -178,25 +161,9 @@ function updateAveragePoint() {
 function updateGraphs() {
     // update all graphical elements with new data and draw them.
     
-    drawAreaChart();
     drawProportionBar();
-//     drawBarChart();
-    
-}
-
-function drawAreaChart() {
-//     console.log("drawAreaChart() called");
-    
-    if (!areaChartIsReadyToDraw) {
-        // Chart isn't ready to Draw (libary have to load or chart is been drawing jet). Call this function later
-        setTimeout(drawAreaChart, 100);
-        return
-    }
-    
-    var areaChart = new google.visualization.AreaChart(document.getElementById('areaChart_container'));
-    
-    areaChart.draw(chartData, chartOptions);
-    
+    drawAreaChart();
+    drawColumnChart();
 }
 
 function drawProportionBar() {    
@@ -211,8 +178,30 @@ function drawProportionBar() {
     
     $('#youtube_bar').html(currentData[1] + 'Viewers');
     $('#twitch_bar').html(currentData[2] + 'Viewers');
+}
+
+function drawAreaChart() {
+//     console.log("drawAreaChart() called");
     
+    if (!areaChartIsReadyToDraw) {
+        // Chart isn't ready to Draw (libary have to load or chart is been drawing jet). Call this function later
+        setTimeout(drawAreaChart, 100);
+        return
+    }
+    var areaChart = new google.visualization.AreaChart(document.getElementById('areaChart_container'));
+    areaChart.draw(areaChartData, areaChartOptions);
+}
+
+function drawColumnChart() {
+//     console.log("drawColumnChart() called");
     
+    if (!columnChartIsReadyToDraw) {
+        // Chart isn't ready to Draw (libary have to load or chart is been drawing jet). Call this function later
+        setTimeout(drawColumnChart, 100);
+        return
+    }
+    var columnChart = new google.visualization.ColumnChart(document.getElementById('columnChart_container'));
+    columnChart.draw(columnChartData, columnChartOptions);
 }
 
 
@@ -221,7 +210,6 @@ function drawProportionBar() {
 //////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
-    
     call4ViewerCount();
     setInterval(call4ViewerCount, UPDATE_INTERVAL);
     $(window).resize(updateGraphs);
@@ -233,4 +221,14 @@ google.charts.load('current', {'packages':['corechart']});
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(function() {
     areaChartIsReadyToDraw = true;
+    columnChartIsReadyToDraw = true;
+    
+    // init columnChart
+    columnChartData = google.visualization.arrayToDataTable([[
+        '',
+        0,
+        0  ,
+    ]],true);
+    var columnChart = new google.visualization.ColumnChart(document.getElementById('columnChart_container'));
+    columnChart.draw(columnChartData, columnChartOptions);
 });

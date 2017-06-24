@@ -14,3 +14,12 @@ Array.prototype.pushToMaxOrShift = function(element, maxLength) {
         this.shift();
     }
 };
+
+function getHoursAndSeconds(milliseconds) {
+    // get a string of a integer of milliseconds in the Format "hh:mm"
+    
+    var eins = new Date(milliseconds);
+    
+    var zwei = eins.toTimeString().substr(0, 5);
+    return zwei;
+};
