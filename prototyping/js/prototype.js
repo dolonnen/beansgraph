@@ -76,30 +76,41 @@ function updateDataPoint(streamer, viewers) {
         // store the new data as data point into an an data point array
         dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
         
+        // generate a data object for the google chart
+        areaChartData = new google.visualization.DataTable();
+        areaChartData.addColumn('number', 'Time');
+        areaChartData.addColumn('number', 'Youtube');
+        areaChartData.addColumn({type:'string', role:'tooltip'}); 
+        areaChartData.addColumn('number', 'Twitch');
+        areaChartData.addColumn({type:'string', role:'tooltip'}); 
+        
+        for (dataPoint of dataPoints) {
+            areaChartData.addRow([
+                dataPoint[0],
+                dataPoint[1],
+                dataPoint[1].toString(),
+                dataPoint[2],
+                dataPoint[2].toString(),
+            ]);
+        }
+        
+        // dataPoint array not complete, we need pseudo data points.
+        for (i = 1; i <= NUMBER_OF_DATAPOINTS - dataPoints.length; i++) {
+            areaChartData.addRow([
+                new Date().getTime() + UPDATE_INTERVAL * i,
+                undefined,
+                '',
+                undefined,
+                '',
+            ]);
+        }        
+   
         // update the data for the columnChart cyclical
         dataUpdateCounter++;
         if (dataUpdateCounter >= NUMBER_OF_DATAPOINTS) {
             // this is enough dataPoints for calculating the average for the bar chart
             dataUpdateCounter = 0;
             updateAveragePoint();
-        }
-        
-        // generate a data object for the google chart
-        if (dataPoints.length <  NUMBER_OF_DATAPOINTS) {
-            // dataPoint array not complete, we need pseudo data points.
-            var undefinedArray = [];
-            for (i = 1; i <= NUMBER_OF_DATAPOINTS - dataPoints.length; i++) {
-                undefinedArray.push([
-                    new Date().getTime() + UPDATE_INTERVAL * i,
-                    undefined,
-                    undefined,
-                ]);
-            }
-            areaChartData = google.visualization.arrayToDataTable(dataPoints.concat(undefinedArray),true);
-        } 
-        else {
-            // dataPoints array complete and ready for the Google graph libary
-            areaChartData = google.visualization.arrayToDataTable(dataPoints,true);
         }
         
         drawProportionBar();
@@ -129,28 +140,35 @@ function updateAveragePoint() {
     
     // store the new average data as data point into an an data point array
     averagePoints.pushToMaxOrShift(newAverageArray, HOURS_IN_THE_PAST * 4);
-    console.log("averagePoints: " + averagePoints);
     
     // generate a data object for the google chart
-    if (averagePoints.length <  HOURS_IN_THE_PAST * 4) {
-        // dataPoint array not complete, we need pseudo data points.
-        var undefinedArray = [];
-        for (i = 1; i <= HOURS_IN_THE_PAST * 4 - averagePoints.length; i++) {
-            undefinedArray.push([
-//                 getHoursAndSeconds(new Date().getTime() + (15*60*1000) * i),
-                '',
-                undefined,
-                undefined,
-            ]);
-        }
-        console.log(averagePoints);
-        columnChartData = google.visualization.arrayToDataTable(averagePoints.concat(undefinedArray),true);
-    } 
-    else {
-        // dataPoints array complete and ready for the Google graph libary
-        columnChartData = google.visualization.arrayToDataTable(averagePoints,true);
+    columnChartData = new google.visualization.DataTable();
+    columnChartData.addColumn('string', 'Time');
+    columnChartData.addColumn('number', 'Youtube');
+    columnChartData.addColumn({type:'string', role:'tooltip'}); 
+    columnChartData.addColumn('number', 'Twitch');
+    columnChartData.addColumn({type:'string', role:'tooltip'}); 
+    
+    for (averagePoint of averagePoints) {
+        columnChartData.addRow([
+            averagePoint[0],
+            averagePoint[1],
+            averagePoint[1].toString(),
+            averagePoint[2],
+            averagePoint[2].toString(),
+        ]);
     }
     
+    // averagePoint array not complete, we need pseudo data points.
+    for (i = 1; i <= NUMBER_OF_DATAPOINTS - averagePoints.length; i++) {
+        columnChartData.addRow([
+            getHoursAndSeconds(new Date().getTime() + (15*60*1000) * i),
+            undefined,
+            '',
+            undefined,
+            '',
+        ]);
+    }        
     drawColumnChart();
 }
 

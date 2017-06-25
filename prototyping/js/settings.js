@@ -4,7 +4,7 @@
 
 const UPDATE_INTERVAL = 10000;
 const NUMBER_OF_DATAPOINTS = 90;
-const HOURS_IN_THE_PAST = 3;
+const HOURS_IN_THE_PAST = 4;
 
 var streamIDs = {
     youtube:"8bYu-0ErsfE",      // 
@@ -47,6 +47,10 @@ var areaChartOptions = {
         gridlines: {color: chartBackgroundColor},
         textStyle: {color: chartTextColor}
     },
+//     annotations: {
+//         style: 'line',
+//         datum: {stem: {length: 1px}}
+//     },
     legend: {position: 'none'},
 };
 
@@ -56,7 +60,7 @@ var columnChartOptions = {
         duration: 200,
         easing: 'out'
     },
-    colors:[youtubeColor,twitchColor],
+    colors: [youtubeColor,twitchColor],
     backgroundColor: chartBackgroundColor,    
     hAxis: {
         baselineColor: chartBackgroundColor,
@@ -64,6 +68,7 @@ var columnChartOptions = {
         textPosition: 'out',
         textStyle: {color: chartTextColor}
     },
+    bar: {groupWidth: "35%"},
     vAxis: {
         minValue: 1000,
         title: "Langzeitübersicht",
