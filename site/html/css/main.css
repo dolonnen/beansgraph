@@ -1,0 +1,58 @@
+
+
+/* Proportion bar */
+
+.proportion_bar_container {
+    text-align: center;
+    margin-left: 
+}
+
+.proportion_bar {
+    border-radius: 5px;
+    overflow: auto;
+    color: white;
+}
+
+.bar_leftlogo {
+    margin-right: 20px;
+    float: left;
+}
+
+.bar_rightlogo {
+    margin-left: 20px;
+    float: right;
+}
+
+/* Youtube */
+.bar_leftpart { 
+    background-color: #cd201f;
+    margin: 0px;
+    padding: 0px;
+    float: left;
+    height: 40px;
+    width: 50%;
+}
+
+/* Twitch */
+.bar_rightpart {
+    background-color: #6441A4;
+    margin: 0px;
+    padding: 0px;
+    float: right;
+    height: 40px;
+    width: 50%;
+}
+
+
+/* Charts */
+
+.areaChart_container {
+    height: 700px;
+    clear: both;
+}
+
+.columnChart_container {
+    height: 700px;
+    clear: both;
+}
+
