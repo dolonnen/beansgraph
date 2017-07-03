@@ -1,7 +1,6 @@
-# This is for my hoster (uberspace)
-# ignore all fcgi-bin exept my fcgi-File
+# This is about my hoster (uberspace)
+# ignore all fcgi-bin
 fcgi-bin/
-!getStreamCreds.fcgi
 
 
 # Created by https://www.gitignore.io/api/kate,linux

@@ -6,13 +6,27 @@ const UPDATE_INTERVAL = 10000;
 const NUMBER_OF_DATAPOINTS = 90;
 const HOURS_IN_THE_PAST = 4;
 
-var streamIDs = {
-    youtube:"8bYu-0ErsfE",      // 
-    twitch:"rocketbeanstv"
-};
-var apiKeys = {
-    youtube:"AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk",
-    twitch:"vsiaqcev0wed3la13a05h3tyi93z2o"
+// var streamIDs = {
+//     youtube:"8bYu-0ErsfE",      // 
+//     twitch:"rocketbeanstv"
+// };
+// var apiKeys = {
+//     youtube:"AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk",
+//     twitch:"vsiaqcev0wed3la13a05h3tyi93z2o"
+// };
+
+var updateCreds = true;
+var updateCredsUrl = "https://bgraph.markab.uberspace.de/fcgi-bin/getStreamCreds.fcgi/";
+
+var defaultStreamCreds = {
+    youtube: {
+        streamID: "SIa_ajTOFs0",
+        apiKey: "AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk"
+    },
+    twitch:{
+        streamID: "rocketbeanstv",
+        apiKey: "vsiaqcev0wed3la13a05h3tyi93z2o"
+    }
 };
 
 // Chart settings

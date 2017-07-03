@@ -2,6 +2,7 @@
 //////////////////////////////////////////////////////////////////////
 // Internal Variables
 //////////////////////////////////////////////////////////////////////
+var streamCreds;
 
 var newData = {
     viewersYoutube:null,
@@ -29,17 +30,18 @@ function call4ViewerCount() {
     newData['viewersTwitch'] = null;
     
     $.getJSON(
-        "https://api.twitch.tv/kraken/streams/"+streamIDs['twitch']+"?client_id="+apiKeys['twitch'],
+        "https://api.twitch.tv/kraken/streams/"+streamCreds['twitch']['streamID']+"?client_id="+streamCreds['twitch']['apiKey'],
         processTwitchData
     );      // typical duration: 250 - 300ms sometimes up to 400ms
     $.getJSON(
-        "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="+streamIDs['youtube']+"&key="+apiKeys['youtube'],
+        "https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id="+streamCreds['youtube']['streamID']+"&key="+streamCreds['youtube']['apiKey'],
         processYtData
     );      // typical duration: 110 -150ms sometimes up to 250ms
 }
 
 function processYtData(result, status) {
-    // recieves the data from YT. If this is returning NaN, the streamID might be wrong (or the api key ^^)
+    // recieves the data from YT. If this is returning NaN, the streamID might be wrong (or the api key ^^).
+    // If there is an actualEndTime in the LiveStreaminDetails, this is the id of an old stream.
 //     console.log("processYtData called");
     
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
@@ -75,6 +77,7 @@ function updateDataPoint(streamer, viewers) {
         
         // store the new data as data point into an an data point array
         dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
+        console.log("dataPoints: " + dataPoints)
         
         // generate a data object for the google chart
         areaChartData = new google.visualization.DataTable();
@@ -229,11 +232,31 @@ function drawColumnChart() {
 //////////////////////////////////////////////////////////////////////
 
 $(document).ready(function(){
-    call4ViewerCount();
-    setInterval(call4ViewerCount, UPDATE_INTERVAL);
+
+    // Update the Credentials for the APIs
+    if (updateCreds) {
+        $.getJSON(updateCredsUrl)
+        .done(function(json) {
+            streamCreds = json;
+            
+            console.log("streamCreds: "+streamCreds);
+            call4ViewerCount();
+            setInterval(call4ViewerCount, UPDATE_INTERVAL);
+        })
+        .fail(function() {
+            streamCreds = defaultStreamCreds;
+            console.log("streamCreds: "+streamCreds);
+        });
+    }
+
+
+
+
     $(window).resize(updateGraphs);
 
 });
+
+
 
 // Load the Google Chart Visualization API and the piechart package.
 google.charts.load('current', {'packages':['corechart']});
