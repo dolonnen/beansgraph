@@ -31,8 +31,8 @@ var defaultStreamCreds = {
 
 // Chart settings
 
-var chartBackgroundColor = '#333333';
-var chartTextColor = '#888888';
+var chartBackgroundColor = '#2c2c2c';
+var chartTextColor = '#cccccc';
 
 var youtubeColor = '#cd201f';
 var twitchColor = '#6441A4';

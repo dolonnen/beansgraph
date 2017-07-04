@@ -117,7 +117,7 @@ function updateDataPoint(streamer, viewers) {
             updateAveragePoint();
         }
         
-        drawProportionBar();
+        updateDom();
         drawAreaChart();
        
     }
@@ -183,23 +183,32 @@ function updateAveragePoint() {
 function updateGraphs() {
     // update all graphical elements with new data and draw them.
     
-    drawProportionBar();
+    updateDom();
     drawAreaChart();
     drawColumnChart();
 }
 
-function drawProportionBar() {    
-//     console.log("drawProportionBar() called");
-
+function updateDom() {    
+//     console.log("updateDom() called");
+    
     var currentData = dataPoints.last();
+    
+    // Update Viewers
+    $('#viewersTotal').html(currentData[1] + currentData[2]);
+    $('#viewersTwitch').html(currentData[2]);
+    $('#viewersYoutube').html(currentData[1]);
+
+    // Update proportional bar
     var shareYoutube = 100 * currentData[1] / (currentData[1] + currentData[2]);
     var shareTwitch = 100 - shareYoutube;
     
     $('#youtube_bar').css('width', shareYoutube + '%');
     $('#twitch_bar').css('width', shareTwitch + '%');
+    $('#youtube_bar').html(Math.round(shareYoutube) + ' %');
+    $('#twitch_bar').html(Math.round(shareTwitch) + ' %');
     
-    $('#youtube_bar').html(currentData[1] + 'Viewers');
-    $('#twitch_bar').html(currentData[2] + 'Viewers');
+    
+    
 }
 
 function drawAreaChart() {

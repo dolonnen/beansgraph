@@ -1,16 +1,54 @@
 
+body {
+    padding-top: 20px;
+    color: #cccccc;
+    background-color: #2c2c2c;
+}
+
+.well {
+    background-color: #444;
+    border: 1px solid #333;
+}
+
+.logo {
+    text-align: center;
+    margin: 30px;
+}
+
+.viewersTotal {
+    font-size: 2.4em;
+    font-weight: bold;
+    text-align: center;
+    height: 140px;
+}
+
+.viewersTwitch {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    height: 140px;
+}
+
+.viewersYoutube {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    height: 140px;
+}
 
 /* Proportion bar */
 
 .proportion_bar_container {
     text-align: center;
-    margin-left: 
+    margin: 20px;
 }
 
 .proportion_bar {
     border-radius: 5px;
     overflow: auto;
-    color: white;
+    color: #2c2c2c;
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .bar_leftlogo {
@@ -23,24 +61,21 @@
     float: right;
 }
 
-/* Youtube */
-.bar_leftpart { 
-    background-color: #cd201f;
+.bar_part {
     margin: 0px;
-    padding: 0px;
-    float: left;
-    height: 40px;
+    padding: 3px 1px;
     width: 50%;
+    vertical-align: middle;
 }
 
-/* Twitch */
-.bar_rightpart {
+.bar_leftpart { 
+    float: left;
     background-color: #6441A4;
-    margin: 0px;
-    padding: 0px;
+}
+
+.bar_rightpart {
     float: right;
-    height: 40px;
-    width: 50%;
+    background-color: #cd201f;
 }
 
 
