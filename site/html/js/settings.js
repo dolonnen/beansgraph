@@ -6,21 +6,12 @@ const UPDATE_INTERVAL = 10000;
 const NUMBER_OF_DATAPOINTS = 90;
 const HOURS_IN_THE_PAST = 4;
 
-// var streamIDs = {
-//     youtube:"8bYu-0ErsfE",      // 
-//     twitch:"rocketbeanstv"
-// };
-// var apiKeys = {
-//     youtube:"AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk",
-//     twitch:"vsiaqcev0wed3la13a05h3tyi93z2o"
-// };
-
-var updateCreds = true;
-var updateCredsUrl = "https://bgraph.markab.uberspace.de/fcgi-bin/getStreamCreds.fcgi/";
+var updateCreds = false;
+var updateCredsUrl = "https://beansgraph.nursozeugs.de/fcgi-bin/getStreamCreds.fcgi/";
 
 var defaultStreamCreds = {
     youtube: {
-        streamID: "SIa_ajTOFs0",
+        streamID: "i3aKiLwR974",
         apiKey: "AIzaSyAEKdRMGaHEVQCTzLrUbX3HPdp82mTpWWk"
     },
     twitch:{
@@ -31,7 +22,8 @@ var defaultStreamCreds = {
 
 // Chart settings
 
-var chartBackgroundColor = '#2c2c2c';
+// var chartBackgroundColor = '#2c2c2c';
+var chartBackgroundColor = '#3a3a3a';
 var chartTextColor = '#cccccc';
 
 var youtubeColor = '#cd201f';
@@ -55,11 +47,19 @@ var areaChartOptions = {
         minValue: 0,
         title: "aktuelle Zuschauerzahl",
         titleTextStyle: {
-            color: chartTextColor
+            color: chartTextColor,
+            italic: false
         },
         baselineColor: chartBackgroundColor,
         gridlines: {color: chartBackgroundColor},
-        textStyle: {color: chartTextColor}
+        textStyle: {
+            color: chartTextColor,
+            italic: false
+        }
+    },
+    chartArea: {
+        width:'80%',
+        height:'80%'
     },
     legend: {position: 'none'},
 };
@@ -83,11 +83,19 @@ var columnChartOptions = {
         minValue: 1000,
         title: "Langzeitübersicht",
         titleTextStyle: {
-            color: chartTextColor
+            color: chartTextColor,
+            italic: false
         },
         baselineColor: chartBackgroundColor,
         gridlines: {color: chartBackgroundColor},
-        textStyle: {color: chartTextColor}
+        textStyle: {
+            color: chartTextColor,
+            italic: false
+        }
+    },
+    chartArea: {
+        width:'80%',
+        height:'90%'
     },
     legend: {position: 'none'},
 };

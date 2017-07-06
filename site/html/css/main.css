@@ -1,18 +1,34 @@
 
 body {
-    padding-top: 20px;
+    padding: 20px 0px;
     color: #cccccc;
     background-color: #2c2c2c;
 }
 
+a:link {
+    color: #dfdfdf;
+}
+
+a:visited {
+    color: #aaaaaa;
+}
+
+a:hover {
+    color: white;
+}
+
 .well {
-    background-color: #444;
+    background-color: #3a3a3a;
     border: 1px solid #333;
+}
+
+hr {
+    border-color: #444;
 }
 
 .logo {
     text-align: center;
-    margin: 30px;
+    margin: 30px 0px;
 }
 
 .viewersTotal {
@@ -40,7 +56,7 @@ body {
 
 .proportion_bar_container {
     text-align: center;
-    margin: 20px;
+    margin: 0px 0px 20px 0px;
 }
 
 .proportion_bar {
@@ -82,12 +98,12 @@ body {
 /* Charts */
 
 .areaChart_container {
-    height: 700px;
+    height: 500px;
     clear: both;
 }
 
 .columnChart_container {
-    height: 700px;
+    height: 500px;
     clear: both;
 }
 

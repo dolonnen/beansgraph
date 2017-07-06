@@ -44,14 +44,17 @@ function processYtData(result, status) {
     // If there is an actualEndTime in the LiveStreaminDetails, this is the id of an old stream.
 //     console.log("processYtData called");
     
+//     console.log(JSON.stringify(result, null, 2));
     var viewers = parseInt(result.items[0].liveStreamingDetails.concurrentViewers);
     updateDataPoint('viewersYoutube', viewers);
+//     console.log('viewersYoutube: ' + viewers);
 }
 
 function processTwitchData(result, status) {
     // recieves the data from Twitch. If this is returning NaN, the api key might be wrong
 //     console.log("processTwitchData called");
     
+//     console.log(JSON.stringify(result, null, 2));
     var viewers = parseInt(result.stream.viewers);
     updateDataPoint('viewersTwitch', viewers);
 }
@@ -63,7 +66,6 @@ function updateDataPoint(streamer, viewers) {
     if (newData[streamer] == null) {
         newData[streamer] = viewers; 
     } 
-    
     
     if ($.isNumeric(newData['viewersYoutube']) && $.isNumeric(newData['viewersTwitch'])) {
         // data was collected already 
@@ -77,7 +79,7 @@ function updateDataPoint(streamer, viewers) {
         
         // store the new data as data point into an an data point array
         dataPoints.pushToMaxOrShift(newDataArray, NUMBER_OF_DATAPOINTS);
-        console.log("dataPoints: " + dataPoints)
+//         console.log("dataPoints: " + dataPoints)
         
         // generate a data object for the google chart
         areaChartData = new google.visualization.DataTable();
@@ -247,20 +249,24 @@ $(document).ready(function(){
         $.getJSON(updateCredsUrl)
         .done(function(json) {
             streamCreds = json;
-            
-            console.log("streamCreds: "+streamCreds);
+            console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
             call4ViewerCount();
             setInterval(call4ViewerCount, UPDATE_INTERVAL);
         })
         .fail(function() {
             streamCreds = defaultStreamCreds;
-            console.log("streamCreds: "+streamCreds);
+            console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
+            call4ViewerCount();
+            setInterval(call4ViewerCount, UPDATE_INTERVAL);
         });
     }
-
-
-
-
+    else {
+        streamCreds = defaultStreamCreds;
+        console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
+        call4ViewerCount();
+        setInterval(call4ViewerCount, UPDATE_INTERVAL);
+    }
+        
     $(window).resize(updateGraphs);
 
 });

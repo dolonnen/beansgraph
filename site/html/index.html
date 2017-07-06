@@ -34,7 +34,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <!--    number of twitch viewers      -->
                     <div class="well viewersTwitch">
                         <p>
@@ -43,7 +43,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <!--    number of total viewers      -->
                     <div class="well viewersTotal">
                         <p>
@@ -52,7 +52,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-sm-4">
                     <!--    number of youtube viewers      -->
                     <div class="well viewersYoutube">
                         <p>
@@ -67,30 +67,58 @@
                 <div class="col-md-12">
                 <!--    Proportion Bar      -->
                     <div class="proportion_bar_container">
-                        <div class="bar_leftlogo">Twitch-Logo</div>
-                        <div class="bar_rightlogo">Youtube-Logo</div>
+                        <div class="bar_leftlogo">
+                            <img src="graphics/twitch-icon-color.png" height="33px">
+                        </div>
+                        <div class="bar_rightlogo">
+                            <img src="graphics/youtube-icon-color.png" height="33px">
+                        </div>
                         <div class="proportion_bar">
-                            <div id="twitch_bar" class="bar_part bar_leftpart"></div>
-                            <div id="youtube_bar" class="bar_part bar_rightpart"></div>
+                            <div id="twitch_bar" class="bar_part bar_leftpart">&nbsp;</div>
+                            <div id="youtube_bar" class="bar_part bar_rightpart">&nbsp;</div>
                         </div>
                     </div>
                 </div>
             </div>
             
+            <div class="row">
+                <div class="col-md-12">
+            <!--    Area Chart for current Data      -->
+                    <div id="areaChart_container" class="well areaChart_container"> </div>
+                </div>
+            </div>
             
-    <!--    Area Chart for current Data      -->
-            <div id="areaChart_container" class="areaChart_container"> </div>
+            <div class="row">
+                <div class="col-md-12">
+            <!--    Column Chart for older Data      -->
+                    <div id="columnChart_container" class="well columnChart_container"> </div>
+                </div>
+            </div>
+         
+        
+<!--             <hr> -->
             
-    <!--    Column Chart for older Data      -->
-            <div id="columnChart_container" class="columnChart_container"> </div>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <a href="https://github.com/dolonnen/beansgraph/blob/master/LICENSE" target="_blank">
+                        &copy; dolonnen 2017
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="mailto:sagwas@beansgraph.nursozeug.de">
+                        sagwas@beansgraph.nursozeug.de
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="https://github.com/dolonnen/beansgraph" target="_blank">
+                        Github
+                    </a>
+                </div>
             
-            
+                    
+         
+            </div>
         </div>
-        
-
-        
-        
-        
         
         <script src="js/myhelpers.js"></script>
         <script src="js/settings.js"></script>
