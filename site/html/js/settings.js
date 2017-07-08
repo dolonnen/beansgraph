@@ -4,7 +4,7 @@
 
 const UPDATE_INTERVAL = 10000;
 const NUMBER_OF_DATAPOINTS = 90;
-const HOURS_IN_THE_PAST = 4;
+const HOURS_IN_THE_PAST = 5;
 
 var updateCreds = false;
 var updateCredsUrl = "https://beansgraph.nursozeugs.de/fcgi-bin/getStreamCreds.fcgi/";

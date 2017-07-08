@@ -159,14 +159,14 @@ function updateAveragePoint() {
         columnChartData.addRow([
             averagePoint[0],
             averagePoint[1],
-            averagePoint[1].toString(),
+            averagePoint[1].toString() + " um " + averagePoint[0] + " auf Youtube",
             averagePoint[2],
-            averagePoint[2].toString(),
+            averagePoint[2].toString() + " um " + averagePoint[0] + " auf Twitch",
         ]);
     }
     
     // averagePoint array not complete, we need pseudo data points.
-    for (i = 1; i <= NUMBER_OF_DATAPOINTS - averagePoints.length; i++) {
+    for (i = 1; i <= HOURS_IN_THE_PAST * 4 - averagePoints.length; i++) {
         columnChartData.addRow([
             getHoursAndSeconds(new Date().getTime() + (15*60*1000) * i),
             undefined,
@@ -249,20 +249,20 @@ $(document).ready(function(){
         $.getJSON(updateCredsUrl)
         .done(function(json) {
             streamCreds = json;
-            console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
+//             console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
             call4ViewerCount();
             setInterval(call4ViewerCount, UPDATE_INTERVAL);
         })
         .fail(function() {
             streamCreds = defaultStreamCreds;
-            console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
+//             console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
             call4ViewerCount();
             setInterval(call4ViewerCount, UPDATE_INTERVAL);
         });
     }
     else {
         streamCreds = defaultStreamCreds;
-        console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
+//         console.log("streamCreds: " + JSON.stringify(streamCreds, null, 2));
         call4ViewerCount();
         setInterval(call4ViewerCount, UPDATE_INTERVAL);
     }
